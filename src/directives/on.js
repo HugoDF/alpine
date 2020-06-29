@@ -3,6 +3,7 @@ import { kebabCase, debounce, isNumeric } from '../utils'
 export function registerListener(component, el, event, modifiers, expression, extraVars = {}) {
     const options = {
         passive: modifiers.includes('passive'),
+        once: modifiers.includes('once')
     };
     if (modifiers.includes('away')) {
         let handler = e => {
@@ -15,10 +16,6 @@ export function registerListener(component, el, event, modifiers, expression, ex
             // Now that we are sure the element is visible, AND the click
             // is from outside it, let's run the expression.
             runListenerHandler(component, expression, e, extraVars)
-
-            if (modifiers.includes('once')) {
-                document.removeEventListener(event, handler, options)
-            }
         }
 
         // Listen for this event at the root level.
@@ -54,10 +51,7 @@ export function registerListener(component, el, event, modifiers, expression, ex
 
                 if (returnValue === false) {
                     e.preventDefault()
-                } else {
-                    if (modifiers.includes('once')) {
-                        listenerTarget.removeEventListener(event, handler, options)
-                    }
+                    listenerTarget.addEventListener(event, handler, options)
                 }
             }
         }
